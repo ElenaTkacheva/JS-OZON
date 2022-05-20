@@ -1,42 +1,54 @@
 import getData from "./getData";
 import renderGoods from "./renderGoods";
-import { priceFilter } from "./filters";
+import { priceFilter, hotSaleFilter } from "./filters";
+
+
+const filter = () => {
+  const minInput = document.getElementById('min');
+  const maxInput = document.getElementById('max');
+  const checkBoxInput = document.getElementById("discount-checkbox");
+  const checkboxSpan = document.querySelector(".filter-check_checkmark");
+
+  minInput.addEventListener('input', () => {
+    getData().then((data) => {
+      renderGoods(
+        priceFilter(
+          hotSaleFilter(data, checkBoxInput.checked),
+          minInput.value,
+          maxInput.value
+        )
+      );
+    });
+  });
+  maxInput.addEventListener("input", () => {
+    getData().then((data) => {
+      renderGoods(
+        priceFilter(
+          hotSaleFilter(data, checkBoxInput.checked),
+          minInput.value,
+          maxInput.value
+        )
+      );
+    });
+  });
+
+  checkBoxInput.addEventListener("change", () => {
+    if (checkBoxInput.checked) {
+      checkboxSpan.classList.add("checked");
+    } else {
+      checkboxSpan.classList.remove("checked");
+    }
+
+    getData().then((data) => {
+      renderGoods(
+        priceFilter(
+          hotSaleFilter(data, checkBoxInput.checked),
+          minInput.value,
+          maxInput.value
+        )
+      );
+    });
+  });
+};
 
 export default filter;
-
-function filter() {
-  const filter = document.querySelector(".filter");
-  const saleCheck = filter.querySelector("#discount-checkbox");
-  const checkMark = filter.querySelector(".filter-check_checkmark");
-  let checkSale = false;
-  let price = {
-    minPrice: "",
-    maxPrice: "",
-  };
-
-  filter.addEventListener("input", (Event) => {
-    switch (Event.target.id) {
-      case "min":
-        price.minPrice = Event.target.value;
-        changeFilter();
-        break;
-      case "max": {
-        price.maxPrice = Event.target.value;
-        changeFilter();
-        break;
-      }
-    }
-  });
-
-  saleCheck.addEventListener("change", () => {
-    checkMark.classList.toggle("checked");
-    checkSale = saleCheck.checked;
-    changeFilter();
-  });
-
-  function changeFilter() {
-    getData().then((data) => {
-      renderGoods(priceFilter(data, price, checkSale));
-    });
-  }
-}
